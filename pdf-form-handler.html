@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auburn Hills Chili's Recognition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.cdnjs.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Raleway', sans-serif;
+            background-color: #f9f9f9;
+        }
+        
+        .header {
+            background: white;
+            width: 100%;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .logo {
+            width: 100px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .logo-left {
+            left: 20px;
+        }
+
+        .logo-right {
+            right: 20px;
+        }
+
+        .title-container {
+            text-align: center;
+            padding: 0 120px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 38px;
+            color: #E31837;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .subtitle {
+            font-size: 26px;
+            margin-top: 8px;
+            color: #E31837;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        #pdf-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        iframe {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            background: #E31837;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            background: #c41430;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <img src="chilis-logo.jpg" alt="Chili's Logo" class="logo logo-left">
+            <div class="title-container">
+                <h1>Auburn Hills Chili's</h1>
+                <div class="subtitle">Above The Line Recognition</div>
+            </div>
+            <img src="chilis-logo.jpg" alt="Chili's Logo" class="logo logo-right">
+        </div>
+    </div>
+
+    <div id="pdf-container">
+        <iframe 
+            src="recognition-form.pdf#toolbar=0&navpanes=0" 
+            width="100%" 
+            height="1100px">
+        </iframe>
+    </div>
+    <button onclick="submitForm()">Submit Recognition</button>
+
+    <script>
+        async function submitForm() {
+            try {
+                const formElement = document.querySelector('#pdf-container');
+                const canvas = await html2canvas(formElement);
+                const imageData = canvas.toDataURL('image/jpeg', 0.9);
+
+                const response = await fetch('/submit-recognition', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: imageData,
+                        location: 'Auburn Hills',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Recognition successfully submitted!');
+                    location.reload();
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                alert('There was an error submitting the form. Please try again.');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
